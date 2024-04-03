@@ -4,11 +4,10 @@
   "description": "Backend Server",
   "main": "server.js",
   "scripts": {
+    "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "author": "John",
-  "license": "ISC",
   "dependencies": {
     "axios": "^1.6.8",
     "cors": "^2.8.5",
