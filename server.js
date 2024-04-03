@@ -1,14 +1,13 @@
 //3rd party dependencies
-import dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
-import weatherData from './data/weather.json';
-
-dotenv.config();
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+const weatherData = require('./data/weather.json');
 
 //application setup
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 //allows access to our app from client applications like our react app
 app.use(cors()); 
@@ -21,10 +20,10 @@ class Forecast {
 }
 
 app.get('/weather', (req, res) => {
-  const { lat, lon, searchQuery } = req.query;
+  const { searchQuery } = req.query;
 
   const city = weatherData.find(city =>
-    city.city_name.toLowerCase() === searchQuery.toLowerCase()
+    city.city_name === searchQuery
   );
 
   if (!city) {
