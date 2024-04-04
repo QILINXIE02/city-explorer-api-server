@@ -1,37 +1,24 @@
-require('dotenv').config();
-const API = process.env.API_KEY;
 const axios = require('axios');
 
-async function getWeather(request, response, next) {
+async function getWeather(req, res) {
     try {
-        const { lat, lon } = request.query;
+        const { lat, lon } = req.query;
+        if (!lat || !lon) throw new Error('Latitude and longitude are required.');
 
-        if (!lat || !lon) {
-            return response.status(400).send('Latitude and Longitude are required');
-        }
+        const apiUrl = `https://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${process.env.API_KEY}`;
+        const response = await axios.get(apiUrl);
+        const data = response.data.data.map(transformWeatherData);
 
-        const url = `https://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${API}&include=minutely`;
-
-        const weatherQuery = await axios.get(url);
-       
-        const forecast = weatherQuery.data.data.map(item => new Forecast(item));
-
-        response.json(forecast);
+        res.json(data);
     } catch (error) {
-        console.error("Error:", error);
-        next(error);
+        console.error(error);
+        res.status(500).send(error.message || 'Error fetching weather data.');
     }
 }
 
-class Forecast {
-    constructor(weatherData) {
-        this.lat = weatherData.lat;
-        this.lon = weatherData.lon;
-        this.date = weatherData.datetime;
-        this.celsius = weatherData.temp;
-        this.description = weatherData.weather.description;
-        this.farenheit = (this.celsius * 9/5) + 32;
-    } 
+function transformWeatherData(weatherData) {
+    return {
+        date: weatherData.ob_time,
+        description: `${weatherData.weather.description}, Temp: ${weatherData.temp}`,
+    };
 }
-
-module.exports = getWeather;
