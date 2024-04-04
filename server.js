@@ -1,11 +1,10 @@
-// 3rd party dependencies
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
-const weatherData = require('./data/weather.json');
 const getWeather = require('./modules/weather');
 const getMovies = require('./modules/movies');
+const getLocation = require('./modules/location');
+
 
 // Application setup
 const app = express();
@@ -39,6 +38,8 @@ app.get('/weather', getWeather);
 
 // Movies endpoint
 app.get('/movies', getMovies);
+
+app.get('/location', getLocation);
 
 // Error handling middleware
 app.use((error, req, res, next) => {
