@@ -1,17 +1,20 @@
-//3rd party dependencies
+// 3rd party dependencies
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const weatherData = require('./data/weather.json');
+const getWeather = require('./modules/weather');
+const getMovies = require('./modules/movies');
 
-//application setup
+// Application setup
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-//allows access to our app from client applications like our react app
-app.use(cors()); 
+// Allows access to our app from client applications like our react app
+app.use(cors());
 
+// Define Forecast class
 class Forecast {
   constructor(day) {
     this.date = day.valid_date;
@@ -19,30 +22,34 @@ class Forecast {
   }
 }
 
-app.get('/weather', (req, res) => {
-  const { searchQuery } = req.query;
-
-  const city = weatherData.find(city =>
-    city.city_name === searchQuery
-  );
-
-  if (!city) {
-    res.status(404).json({ error: "City not found in placeholder data." });
-    return;
+// Define Movies class
+class Movies {
+  constructor(movieData) {
+    this.title = movieData.title;
+    this.overview = movieData.overview;
+    this.average_votes = movieData.vote_average;
+    this.total_votes = movieData.vote_count;
+    this.image_url = `https://image.tmdb.org/t/p/w500${movieData.poster_path}`;
+    this.popularity = movieData.popularity;
   }
+}
 
-  const forecasts = city.data.map(day => new Forecast(day));
-  res.json(forecasts);
-});
+// Weather endpoint
+app.get('/weather', getWeather);
 
+// Movies endpoint
+app.get('/movies', getMovies);
+
+// Error handling middleware
 app.use((error, req, res, next) => {
-  console.error(error); 
+  console.error(error);
   res.status(500).json({ error: "Something went wrong on the server." });
 });
 
-
+// 404 Not Found handler
 app.use('*', (req, res) => res.status(404).send("Not Found"));
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

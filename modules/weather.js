@@ -22,3 +22,5 @@ function transformWeatherData(weatherData) {
         description: `${weatherData.weather.description}, Temp: ${weatherData.temp}`,
     };
 }
+
+module.exports = getWeather;
