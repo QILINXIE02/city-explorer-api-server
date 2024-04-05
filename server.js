@@ -4,16 +4,13 @@ const cors = require('cors');
 const getWeather = require('./modules/weather');
 const getMovies = require('./modules/movies');
 const getLocation = require('./modules/location');
+const getYelp = require('./modules/yelp');
 
-
-// Application setup
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Allows access to our app from client applications like our react app
 app.use(cors());
 
-// Define Forecast class
 class Forecast {
   constructor(day) {
     this.date = day.valid_date;
@@ -21,8 +18,7 @@ class Forecast {
   }
 }
 
-// Define Movies class
-class Movies {
+class Movie {
   constructor(movieData) {
     this.title = movieData.title;
     this.overview = movieData.overview;
@@ -33,24 +29,18 @@ class Movies {
   }
 }
 
-// Weather endpoint
 app.get('/weather', getWeather);
-
-// Movies endpoint
 app.get('/movies', getMovies);
-
 app.get('/location', getLocation);
+app.get('/yelp', getYelp);
 
-// Error handling middleware
 app.use((error, req, res, next) => {
   console.error(error);
-  res.status(500).json({ error: "Something went wrong on the server." });
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
-// 404 Not Found handler
 app.use('*', (req, res) => res.status(404).send("Not Found"));
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
